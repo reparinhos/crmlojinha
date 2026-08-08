@@ -1,1 +1,48 @@
 
+<!-- painel.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - CRM Lojinha</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Painel da Lojinha</h1>
+        <button id="btn-sair" class="btn-danger">Sair</button>
+    </header>
+
+    <main class="dashboard">
+        <!-- SEÇÃO: FIADOS -->
+        <section class="card">
+            <h2>Gestão de Fiados (Clientes)</h2>
+            <form id="form-cliente" class="form-inline">
+                <input type="text" id="nome-cliente" placeholder="Nome do Cliente" required>
+                <input type="number" id="divida-inicial" placeholder="Dívida Inicial (R$)" step="0.01" required>
+                <button type="submit">Adicionar Cliente</button>
+            </form>
+            <div id="lista-clientes" class="lista-dados">
+                <!-- Clientes aparecerão aqui -->
+            </div>
+        </section>
+
+        <!-- SEÇÃO: ESTOQUE -->
+        <section class="card">
+            <h2>Gestão de Estoque</h2>
+            <form id="form-estoque" class="form-inline">
+                <input type="text" id="nome-produto" placeholder="Nome do Produto" required>
+                <input type="number" id="qtd-produto" placeholder="Quantidade" required>
+                <input type="number" id="preco-produto" placeholder="Preço (R$)" step="0.01" required>
+                <button type="submit">Adicionar Produto</button>
+            </form>
+            <div id="lista-estoque" class="lista-dados">
+                <!-- Produtos aparecerão aqui -->
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/painel.js"></script>
+</body>
+</html>
