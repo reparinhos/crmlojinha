@@ -5,12 +5,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase
 
 // SUBSTITUA ESTES VALORES PELAS SUAS CHAVES DO FIREBASE
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY_AQUI",
-    authDomain: "SEU_PROJETO.firebaseapp.com",
-    projectId: "SEU_PROJETO",
-    storageBucket: "SEU_PROJETO.appspot.com",
-    messagingSenderId: "SEU_MESSAGING_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyAJhBxpJbSMPfoBz0UZLkXFPJdy-sHckps",
+    authDomain: "crm-lojinha.firebaseapp.com",
+    projectId: "crm-lojinha",
+    storageBucket: "crm-lojinha.firebasestorage.app",
+    messagingSenderId: "550296080969",
+    appId: "1:550296080969:web:ffc809b0bcc81d66842598"
 };
 
 const app = initializeApp(firebaseConfig);
