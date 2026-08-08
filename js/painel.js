@@ -1,5 +1,3 @@
-
-// js/painel.js
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -26,7 +24,8 @@ const listaClientes = document.getElementById("lista-clientes");
 formCliente.addEventListener("submit", async (e) => {
     e.preventDefault();
     const nome = document.getElementById("nome-cliente").value;
-    const divida = parseFloat(document.getElementById("divida-inicial").value);
+    // Já converte a vírgula para ponto caso você digite no formulário
+    const divida = parseFloat(document.getElementById("divida-inicial").value.replace(',', '.'));
 
     await addDoc(collection(db, "clientes"), { nome, divida });
     formCliente.reset();
@@ -45,20 +44,54 @@ async function carregarClientes() {
         div.innerHTML = `
             <div>
                 <strong>${cliente.nome}</strong> <br> 
-                Dívida: <span class="${cliente.divida > 0 ? 'texto-vermelho' : 'texto-verde'}">R$ ${cliente.divida.toFixed(2)}</span>
+                Dívida: <span class="${cliente.divida > 0 ? 'texto-vermelho' : 'texto-verde'}">R$ ${cliente.divida.toFixed(2).replace('.', ',')}</span>
             </div>
             <div class="acoes">
-                <button onclick="alterarDivida('${documento.id}', ${cliente.divida}, -10)">Abater R$10</button>
-                <button onclick="alterarDivida('${documento.id}', ${cliente.divida}, 10)">+ R$10 (Fiado)</button>
+                <button style="background: #28a745; color: white;" onclick="abaterValor('${documento.id}', ${cliente.divida})">💰 Abater</button>
+                <button style="background: #ffc107; color: black;" onclick="aumentarDivida('${documento.id}', ${cliente.divida})">📝 Mais Fiado</button>
             </div>
         `;
         listaClientes.appendChild(div);
     });
 }
 
-window.alterarDivida = async (id, dividaAtual, valorMudanca) => {
-    const novaDivida = dividaAtual + valorMudanca;
-    await updateDoc(doc(db, "clientes", id), { divida: novaDivida < 0 ? 0 : novaDivida });
+// 1. Função para PAGAMENTO (Diminuir a dívida)
+window.abaterValor = async (id, dividaAtual) => {
+    let valorDigitado = prompt("Quanto o cliente está pagando agora? (Ex: 15,50)");
+    
+    if (!valorDigitado) return; // Cancela se apertar "Cancelar"
+
+    // Troca a vírgula do Brasil por ponto para o sistema entender
+    let valor = parseFloat(valorDigitado.replace(',', '.'));
+
+    if (isNaN(valor) || valor <= 0) {
+        alert("Valor inválido! Digite apenas números positivos.");
+        return;
+    }
+
+    let novaDivida = dividaAtual - valor;
+    if (novaDivida < 0) novaDivida = 0; // Não deixa a dívida ficar negativa
+
+    await updateDoc(doc(db, "clientes", id), { divida: novaDivida });
+    carregarClientes();
+};
+
+// 2. Função para NOVA COMPRA (Aumentar a dívida)
+window.aumentarDivida = async (id, dividaAtual) => {
+    let valorDigitado = prompt("Qual o valor da nova compra fiado? (Ex: 20,00)");
+    
+    if (!valorDigitado) return;
+
+    let valor = parseFloat(valorDigitado.replace(',', '.'));
+
+    if (isNaN(valor) || valor <= 0) {
+        alert("Valor inválido! Digite apenas números positivos.");
+        return;
+    }
+
+    let novaDivida = dividaAtual + valor;
+
+    await updateDoc(doc(db, "clientes", id), { divida: novaDivida });
     carregarClientes();
 };
 
@@ -70,7 +103,7 @@ formEstoque.addEventListener("submit", async (e) => {
     e.preventDefault();
     const nome = document.getElementById("nome-produto").value;
     const qtd = parseInt(document.getElementById("qtd-produto").value);
-    const preco = parseFloat(document.getElementById("preco-produto").value);
+    const preco = parseFloat(document.getElementById("preco-produto").value.replace(',', '.'));
 
     await addDoc(collection(db, "estoque"), { nome, qtd, preco });
     formEstoque.reset();
@@ -88,7 +121,7 @@ async function carregarEstoque() {
         div.className = "item-lista";
         div.innerHTML = `
             <div>
-                <strong>${produto.nome}</strong> (R$ ${produto.preco.toFixed(2)})<br> 
+                <strong>${produto.nome}</strong> (R$ ${produto.preco.toFixed(2).replace('.', ',')})<br> 
                 Qtd no Estoque: <strong>${produto.qtd}</strong>
             </div>
             <div class="acoes">
@@ -108,7 +141,7 @@ window.alterarEstoque = async (id, qtdAtual, valorMudanca) => {
 };
 
 window.excluirProduto = async (id) => {
-    if(confirm("Tem certeza que deseja excluir?")) {
+    if(confirm("Tem certeza que deseja excluir este produto do estoque?")) {
         await deleteDoc(doc(db, "estoque", id));
         carregarEstoque();
     }
